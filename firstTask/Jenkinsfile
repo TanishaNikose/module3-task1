@@ -1,43 +1,43 @@
-pipeline{
+pipeline {
     agent any
 
-    stages{
-        stage('Checkout'){
-            steps{
+    stages {
+        stage('Checkout') {
+            steps {
                 checkout scm
             }
         }
 
-        stage('Build'){
-            steps{
-                sh 'docker build -t flask-app:${BUILD_NUMBER} .'
-            }
-
-        }
-
-        stage('Test'){
-            steps{
-                sh 'echo "Running basic tests..."'
+        stage('Build') {
+            steps {
+                dir('firstTask') {
+                    bat "docker build -t flask-app:${BUILD_NUMBER} ."
+                }
             }
         }
 
-        stage('Deploy to Staging'){
+        stage('Test') {
+            steps {
+                bat 'echo Running basic tests...'
+            }
+        }
+
+        stage('Deploy to Staging') {
             when {
                 branch 'develop'
             }
-            steps{
-                sh 'echo "Deploying to staging environement"'
-            }
-        }g
-
-        post{
-            success{
-                echo 'Pipeline executed successfully'
-            }
-            failure{
-                echo 'Pipeline failed'
+            steps {
+                bat 'echo Deploying to staging environment'
             }
         }
     }
 
+    post {
+        success {
+            echo 'Pipeline executed successfully'
+        }
+        failure {
+            echo 'Pipeline failed'
+        }
+    }
 }
