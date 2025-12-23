@@ -11,7 +11,19 @@ pipeline {
         stage('Build') {
             steps {
                 dir('firstTask') {
+                    // Yahan hum image build kar rahe hain
                     bat "docker build -t flask-app:${BUILD_NUMBER} ."
+                }
+            }
+        }
+
+        // --- NAYA STAGE: DOCKER LOGIN ---
+        stage('Docker Login') {
+            steps {
+                // 'DOCKER_CRED' wo ID hai jo aapne Jenkins Credentials mein banayi hai
+                withCredentials([usernamePassword(credentialsId: 'DOCKER_CRED', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    // Windows ke liye 'bat' use karein
+                    bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
                 }
             }
         }
@@ -27,6 +39,7 @@ pipeline {
                 branch 'develop'
             }
             steps {
+                // Agar Staging ke liye alag token hai toh yahan use karein
                 bat 'echo Deploying to staging environment'
             }
         }
